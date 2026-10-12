@@ -9,7 +9,7 @@ page = requests.get(Url)
 page.raise_for_status()
 carpeta_script = os.path.dirname(os.path.abspath(__file__))
 raw = os.path.join(carpeta_script, "..", "data", "raw")
-# print (raw)```python
+# print (raw)
 page.encoding = "utf-8"
 
 os.makedirs(raw, exist_ok=True)
@@ -19,3 +19,4 @@ def guardar_html(contenido, ruta_archivo):
     with open(ruta_archivo,  mode = 'w', encoding="utf-8") as archivo:
         archivo.write(contenido)
 guardar_html(page.text, pagina1)
+print (ruta_archivo)
