@@ -26,24 +26,28 @@ df["price"] =  df["price"].str.replace('£', '').astype(float)
 ruta_final = os.path.join(processed, f"precios{hoy}.csv")
 
 
-
-# print(carpeta_script)
-# print(sorted(os.listdir(processed)))
-# print(len(os.listdir(processed)))
 # listar la carpeta
 # leer csv anterior asi no se confunde por que ya los datos anteriores estan
 # para luego guardar el actual
 
 lista = os.listdir(processed)
 if not lista:
+    print("No hay archivos anteriores en la carpeta. Es la primera ejecución.")
     viejo = None
     anterior = None
 else:
     reciente = sorted(lista)[-1]
-    anterior  = os.path.join(processed, reciente)
-    viejo = pd.read_csv(anterior)
+    ruta  = os.path.join(processed, reciente)
+    viejo = pd.read_csv(ruta)
     if viejo is not None:
-        df = merge(df, viejo, on="titulo")
-        print(df)
-# df.to_csv(ruta_final, index=False) # guarda el DataFrame en un archivo CSV
+        r = pd.merge(df, viejo, how='outer', on="title", suffixes=('_actual', '_anterior'))
+        if r is not None:
+            r['price_anterior'] = r['price_anterior'].fillna(0)
+            r['price_actual'] = r['price_actual'].fillna(0)
+            r['price_cambio'] = r['price_actual'] - r['price_anterior']
+            print(r)
+            if r['price_cambio'].any():
+                print("Hay cambios de precio:")
+                print(r[r['price_cambio'] != 0])
+## df.to_csv(ruta_final, index=False) # guarda el DataFrame en un archivo CSV
 print(reciente, len(viejo), len(df))
